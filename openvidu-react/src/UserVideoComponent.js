@@ -1,6 +1,6 @@
-// import React, { Component } from 'react';
-// import OpenViduVideoComponent from './OvVideo';
-// import './UserVideo.css';
+import React, { Component } from 'react';
+import OpenViduVideoComponent from './OvVideo';
+import './UserVideo.css';
 
 // export default class UserVideoComponent extends Component {
 
@@ -24,10 +24,10 @@
 //     }
 // }
 
-import React from 'react';
-import OpenViduVideoComponent from './OvVideo';
-import './UserVideo.css';
-import S_words from './page_info/S_word';
+// import React from 'react';
+// import OpenViduVideoComponent from './OvVideo';
+// import './UserVideo.css';
+// import S_words from './page_info/S_word';
 
 const UserVideoComponent = ({ streamManager }) => {
   const getNicknameTag = () => {
@@ -37,20 +37,12 @@ const UserVideoComponent = ({ streamManager }) => {
 
   return (
     <div>
-      <div>TEST2222</div>
-      {streamManager !== undefined ? (
-        <>
-        <div className="streamcomponent">
-          <OpenViduVideoComponent streamManager={streamManager} />
-          <div><p>{getNicknameTag()}</p></div>
-          {getNicknameTag()==1 ? console.log(true) : console.log(false)}
-          {/* <div><p>제시어를 여기로 출력하면?</p></div> */}
-        </div>
-        </>
-      ) : null}
+        {streamManager !== undefined ? (
         <div>
-            여기는 어떻게 출력되는가?
+          <OpenViduVideoComponent streamManager={streamManager} />
+          <div>{getNicknameTag()}</div>
         </div>
+      ) : null}
     </div>
   );
 };
