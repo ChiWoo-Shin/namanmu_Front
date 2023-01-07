@@ -1,11 +1,20 @@
+import React, { Component, useEffect, useState, useRef } from 'react';
+import { useDispatch, useSelector } from "react-redux";
+import "./App.css";
+import ReactDOM from "react-dom";
+import { Button } from "react-bootstrap";
+import Main_timer from "./for_game/main_timer"; // Timer
+
+//Item list
+import ItemOneBlur from "./item_info/Item_1_blur";
+import ItemTwoDecal from "./item_info/Item_2_decalco";
+import ItemThreeCut from "./item_info/Item_3_4cut";
+
 import { OpenVidu } from 'openvidu-browser';
 
 import axios from 'axios';
-import React, { Component, useEffect, useState, useRef } from 'react';
-import './App.css';
 import UserVideoComponent from './UserVideoComponent';
 import S_words from './page_info/S_word';
-
 
 const APPLICATION_SERVER_URL = "http://localhost:5000/";
 
@@ -23,9 +32,10 @@ class webCam extends Component {
             subscribers: [],
         };
 
+
         this.joinSession = this.joinSession.bind(this);
         this.leaveSession = this.leaveSession.bind(this);
-        this.switchCamera = this.switchCamera.bind(this);
+        // this.switchCamera = this.switchCamera.bind(this);
         this.handleChangeSessionId = this.handleChangeSessionId.bind(this);
         this.handleChangeUserName = this.handleChangeUserName.bind(this);
         this.handleMainVideoStream = this.handleMainVideoStream.bind(this);
@@ -58,7 +68,7 @@ class webCam extends Component {
 
     handleMainVideoStream(stream) {
         if (this.state.mainStreamManager !== stream) {
-            
+
             this.setState({
                 mainStreamManager: stream
             });
@@ -105,6 +115,8 @@ class webCam extends Component {
                     this.setState({
                         subscribers: subscribers,
                     });
+
+
                 });
 
                 // On every Stream destroyed...
@@ -161,7 +173,7 @@ class webCam extends Component {
                                 mainStreamManager: publisher,
                                 publisher: publisher,
                             });
-                            console.log(this.state.mainStreamManager+ "확인을 거칩니다")
+                            console.log(this.state.mainStreamManager + "확인을 거칩니다")
                         })
                         .catch((error) => {
                             console.log('There was an error connecting to the session:', error.code, error.message);
@@ -190,45 +202,50 @@ class webCam extends Component {
         });
     }
 
-    async switchCamera() {
-        try {
-            const devices = await this.OV.getDevices()
-            var videoDevices = devices.filter(device => device.kind === 'videoinput');
+    // async switchCamera() {
+    //     try {
+    //         const devices = await this.OV.getDevices()
+    //         var videoDevices = devices.filter(device => device.kind === 'videoinput');
 
-            if (videoDevices && videoDevices.length > 1) {
+    //         if (videoDevices && videoDevices.length > 1) {
 
-                var newVideoDevice = videoDevices.filter(device => device.deviceId !== this.state.currentVideoDevice.deviceId)
+    //             var newVideoDevice = videoDevices.filter(device => device.deviceId !== this.state.currentVideoDevice.deviceId)
 
-                if (newVideoDevice.length > 0) {
-                    // Creating a new publisher with specific videoSource
-                    // In mobile devices the default and first camera is the front one
-                    var newPublisher = this.OV.initPublisher(undefined, {
-                        videoSource: newVideoDevice[0].deviceId,
-                        publishAudio: true,
-                        publishVideo: true,
-                        mirror: true
-                    });
+    //             if (newVideoDevice.length > 0) {
+    //                 // Creating a new publisher with specific videoSource
+    //                 // In mobile devices the default and first camera is the front one
+    //                 var newPublisher = this.OV.initPublisher(undefined, {
+    //                     videoSource: newVideoDevice[0].deviceId,
+    //                     publishAudio: true,
+    //                     publishVideo: true,
+    //                     mirror: true
+    //                 });
 
-                    //newPublisher.once("accessAllowed", () => {
-                    await this.state.session.unpublish(this.state.mainStreamManager)
+    //                 //newPublisher.once("accessAllowed", () => {
+    //                 await this.state.session.unpublish(this.state.mainStreamManager)
 
-                    await this.state.session.publish(newPublisher)
-                    this.setState({
-                        currentVideoDevice: newVideoDevice[0],
-                        mainStreamManager: newPublisher,
-                        publisher: newPublisher,
-                    });
-                }
-            }
-        } catch (e) {
-            console.error(e);
-        }
-    }
+    //                 await this.state.session.publish(newPublisher)
+    //                 this.setState({
+    //                     currentVideoDevice: newVideoDevice[0],
+    //                     mainStreamManager: newPublisher,
+    //                     publisher: newPublisher,
+    //                 });
+    //             }
+    //         }
+    //     } catch (e) {
+    //         console.error(e);
+    //     }
+    // }
 
 
     render() {
         const mySessionId = this.state.mySessionId;
         const myUserName = this.state.myUserName;
+        // const mainStream = this.find((a) =>{
+        //     if (a.state.mySessionId === 1){
+        //         return a.state.mainStreamManager
+        //     }
+        // })
 
         return (
             <div className="container">
@@ -282,24 +299,91 @@ class webCam extends Component {
                                 value="Leave session"
                             />
                         </div>
-                        <S_words />
-                        {this.state.mainStreamManager !== undefined ? (
-                            <div id="main-video" className="col-md-6">
-                                <UserVideoComponent streamManager={this.state.mainStreamManager} />
+
+                        <div className="wide-frame">
+                            {/* A팀 프레임 */}
+                            <div className="a-screen">
+                                <div className="score_box">
+                                    <div className="box">
+                                        <div className="Score" id="A_currentScore">
+                                            현재 라운드 점수
+                                        </div>
+                                    </div>
+                                    <div className="box">
+                                        <div className="Score" id="A_totalScore">
+                                            총 점수
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id={0} className="video_box">
+                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.publisher} /> </div>
+                                </div>
+                                {/* <div id={0} className="video_box">
+                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[0]} /> </div>
+                                </div> */}
+                                <div id={1} className="video_box">
+                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[0]} /> </div>
+                                </div>
+                                <div id={2} className="video_box">
+                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[1]} /> </div>
+                                </div>
                             </div>
-                        ) : null}
-                        {/* <div id="video-container" className="col-md-6">
-                            {this.state.publisher !== undefined ? (
-                                <div className="stream-container col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(this.state.publisher)}>
-                                    <UserVideoComponent streamManager={this.state.publisher} />
+
+                            {/* 중앙 freame */}
+                            <div className="mid-screen">
+                                <div className="team_box">
+                                    <div className="team_turn">
+                                        <h1>
+                                            {/* <center>  */}
+                                            <Main_timer />
+                                            {/* </center> */}
+                                        </h1>
+                                    </div>
                                 </div>
-                            ) : null}
-                            {this.state.subscribers.map((sub, i) => (
-                                <div key={i} className="stream-container col-md-6 col-xs-6" onClick={() => this.handleMainVideoStream(sub)}>
-                                    <UserVideoComponent streamManager={sub} />
+                                <div className="main_video_box">
+                                    <div className="main_video_frame" id="main_screen">
+                                        {/* <canvas ref={canvasRef} autoPlay className="Video_myturn" /> */}
+                                        <UserVideoComponent streamManager={this.state.mainStreamManager} className="Video_myturn" />
+                                    </div>
                                 </div>
-                            ))}
-                        </div> */}
+                                <div>
+                                    <div className="team_box">
+                                        <div className="team_turn">
+                                            {/* <Button onClick={renderCam4}>원본</Button>
+                                            <Button onClick={renderCam}>blur</Button>
+                                            <Button onClick={renderCam2}>좌좌우우</Button>
+                                            <Button onClick={renderCam3}>퍼즐(4)</Button> */}
+                                        </div>
+                                    </div>
+                                    {/* {state.S_words_Q[i]} */}
+                                    <div>
+                                        <S_words />
+                                    </div>
+                                </div>
+                            </div>
+                            {/* B팀 프레임 */}
+                            <div className="b-screen">
+                                <div className="box">
+                                    <div className="Score" id="A_currentScore">
+                                        현재 라운드 점수
+                                    </div>
+                                </div>
+                                <div className="box">
+                                    <div className="Score" id="A_totalScore">
+                                        총 점수
+                                    </div>
+                                </div>
+                                <div id={3} className="video_box">
+                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[2]} /> </div>
+                                </div>
+                                <div id={4} className="video_box">
+                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[3]} /> </div>
+                                </div>
+                                <div id={5} className="video_box">
+                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[4]} /> </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 ) : null}
             </div>
