@@ -30,6 +30,7 @@ class webCam extends Component {
             mainStreamManager: undefined,  // Main video of the page. Will be the 'publisher' or one of the 'subscribers'
             publisher: undefined,
             subscribers: [],
+            gamers: [],
         };
 
 
@@ -92,13 +93,11 @@ class webCam extends Component {
         this.OV = new OpenVidu();
 
         // --- 2) Init a session ---
-        console.log("여기까지는 옵니다1111" + this.OV)
         this.setState(
             {
                 session: this.OV.initSession(),
             },
             () => {
-                console.log("여기까지는 옵니다2222222" + this.state.session)
                 var mySession = this.state.session;
 
                 // --- 3) Specify the actions when events take place in the session ---
@@ -107,21 +106,38 @@ class webCam extends Component {
                 mySession.on('streamCreated', (event) => {
                     // Subscribe to the Stream to receive it. Second parameter is undefined
                     // so OpenVidu doesn't create an HTML video by its own
-                    var subscriber = mySession.subscribe(event.stream, undefined);
-                    var subscribers = this.state.subscribers;
-                    subscribers.push(subscriber);
+                    var subscriber = mySession.subscribe(event.stream, undefined); // 현재 내 정보를 subscribe하고
+                    var subscribers = this.state.subscribers; // 현재 state.subscribers에 있는 것을 subscribers에 넣고
+                    subscribers.push(subscriber); // subscribers에 subscriber(나) 를 집어 넣음
+
+                    var gamers = this.state.gamers; // gamers 리스트를 받아옴
+                    gamers.push({ name: JSON.parse(event.stream.connection.data).clientData, streamManager: subscriber }); // gamers에 현재 나를 넣음
+                    console.log("여기는 created" + JSON.parse(event.stream.connection.data).clientData + " " + subscriber)
+
+
+                    gamers.map((a, i) => {
+                        console.log("name11111111 : " + a.name + " " + gamers.length + " " + i)
+                        console.log(a.streamManager)
+                    })
 
                     // Update the state with the new subscribers
                     this.setState({
                         subscribers: subscribers,
+                        gamers: gamers
                     });
 
-
+                    gamers.map((a, i) => {
+                        const clearElement = () => {
+                            document.getElementById(i).innerHTML = "";
+                        };
+                        ReactDOM.render(
+                            <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[i].streamManager} /></div>,
+                            document.getElementById(i)
+                        );
+                    })
                 });
-
                 // On every Stream destroyed...
                 mySession.on('streamDestroyed', (event) => {
-
                     // Remove the stream from 'subscribers' array
                     this.deleteSubscriber(event.stream.streamManager);
                 });
@@ -132,18 +148,14 @@ class webCam extends Component {
                 });
 
                 // --- 4) Connect to the session with a valid user token ---
-
                 // Get a token from the OpenVidu deployment
                 this.getToken().then((token) => {
-                    console.log("여기까지는 옵니다3333333")
                     // First param is the token got from the OpenVidu deployment. Second param can be retrieved by every user on event
                     // 'streamCreated' (property Stream.connection.data), and will be appended to DOM as the user's nickname
                     mySession.connect(token, { clientData: this.state.myUserName })
-
                         .then(async () => {
-                            console.log("여기까지는 옵니다. 4444 " + token + mySession)
+                            console.log("여기가 getToken")
                             // --- 5) Get your own camera stream ---
-
                             // Init a publisher passing undefined as targetElement (we don't want OpenVidu to insert a video
                             // element: we will manage it on our own) and with the desired properties
                             let publisher = await this.OV.initPublisherAsync(undefined, {
@@ -156,24 +168,45 @@ class webCam extends Component {
                                 insertMode: 'APPEND', // How the video is inserted in the target element 'video-container'
                                 mirror: true, // Whether to mirror your local video or not
                             });
-
                             // --- 6) Publish your stream ---
-
                             mySession.publish(publisher);
 
-                            // Obtain the current video device in use
-                            var devices = await this.OV.getDevices();
-                            var videoDevices = devices.filter(device => device.kind === 'videoinput');
-                            var currentVideoDeviceId = publisher.stream.getMediaStream().getVideoTracks()[0].getSettings().deviceId;
-                            var currentVideoDevice = videoDevices.find(device => device.deviceId === currentVideoDeviceId);
+                            var gamers = this.state.gamers;
+                            gamers.push({ name: this.state.myUserName, streamManager: publisher });
+                            console.log("여기는 getToken" + this.state.myUserName + " " + publisher)
 
-                            // Set the main video in the page to display our webcam and store our Publisher
+                            let copy = [...gamers];
+                            copy.sort(function (a, b) {
+                                if (a.name < b.name) {
+                                    return -1
+                                } else if (a.name > b.name) {
+                                    return 1
+                                } else {
+                                    return 0
+                                }
+
+                            });
+
+                            copy.map((a, i) => {
+                                console.log("name22222222 : " + a.name + " " + gamers.length + " " + i)
+                            })
+
                             this.setState({
-                                currentVideoDevice: currentVideoDevice,
                                 mainStreamManager: publisher,
                                 publisher: publisher,
+                                gamers: copy,
                             });
-                            console.log(this.state.mainStreamManager + "확인을 거칩니다")
+
+                            gamers.map((a, i) => {
+                                const clearElement = () => {
+                                    document.getElementById(i).innerHTML = "";
+                                };
+                                ReactDOM.render(
+                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[i].streamManager} /></div>,
+                                    document.getElementById(i)
+                                );
+                            })
+
                         })
                         .catch((error) => {
                             console.log('There was an error connecting to the session:', error.code, error.message);
@@ -181,7 +214,9 @@ class webCam extends Component {
                 });
             },
         );
-    }
+    };
+
+
 
     leaveSession() {
         // --- 7) Leave the session by calling 'disconnect' method over the Session object ---
@@ -202,50 +237,10 @@ class webCam extends Component {
         });
     }
 
-    // async switchCamera() {
-    //     try {
-    //         const devices = await this.OV.getDevices()
-    //         var videoDevices = devices.filter(device => device.kind === 'videoinput');
-
-    //         if (videoDevices && videoDevices.length > 1) {
-
-    //             var newVideoDevice = videoDevices.filter(device => device.deviceId !== this.state.currentVideoDevice.deviceId)
-
-    //             if (newVideoDevice.length > 0) {
-    //                 // Creating a new publisher with specific videoSource
-    //                 // In mobile devices the default and first camera is the front one
-    //                 var newPublisher = this.OV.initPublisher(undefined, {
-    //                     videoSource: newVideoDevice[0].deviceId,
-    //                     publishAudio: true,
-    //                     publishVideo: true,
-    //                     mirror: true
-    //                 });
-
-    //                 //newPublisher.once("accessAllowed", () => {
-    //                 await this.state.session.unpublish(this.state.mainStreamManager)
-
-    //                 await this.state.session.publish(newPublisher)
-    //                 this.setState({
-    //                     currentVideoDevice: newVideoDevice[0],
-    //                     mainStreamManager: newPublisher,
-    //                     publisher: newPublisher,
-    //                 });
-    //             }
-    //         }
-    //     } catch (e) {
-    //         console.error(e);
-    //     }
-    // }
-
-
     render() {
         const mySessionId = this.state.mySessionId;
         const myUserName = this.state.myUserName;
-        // const mainStream = this.find((a) =>{
-        //     if (a.state.mySessionId === 1){
-        //         return a.state.mainStreamManager
-        //     }
-        // })
+
 
         return (
             <div className="container">
@@ -315,17 +310,17 @@ class webCam extends Component {
                                         </div>
                                     </div>
                                 </div>
-                                <div id={0} className="video_box">
-                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.publisher} /> </div>
+                                <div className="video_box">
+                                    <div id={0} className="video_frame">
+                                    </div>
                                 </div>
-                                {/* <div id={0} className="video_box">
-                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[0]} /> </div>
-                                </div> */}
-                                <div id={1} className="video_box">
-                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[0]} /> </div>
+                                <div className="video_box">
+                                    <div id={1} className="video_frame">
+                                    </div>
                                 </div>
-                                <div id={2} className="video_box">
-                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[1]} /> </div>
+                                <div className="video_box">
+                                    <div id={2} className="video_frame">
+                                    </div>
                                 </div>
                             </div>
 
@@ -343,7 +338,7 @@ class webCam extends Component {
                                 <div className="main_video_box">
                                     <div className="main_video_frame" id="main_screen">
                                         {/* <canvas ref={canvasRef} autoPlay className="Video_myturn" /> */}
-                                        <UserVideoComponent streamManager={this.state.mainStreamManager} className="Video_myturn" />
+                                        {/* <UserVideoComponent streamManager={this.state.mainStreamManager} className="Video_myturn" /> */}
                                     </div>
                                 </div>
                                 <div>
@@ -373,14 +368,17 @@ class webCam extends Component {
                                         총 점수
                                     </div>
                                 </div>
-                                <div id={3} className="video_box">
-                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[2]} /> </div>
+                                <div className="video_box">
+                                    <div id={3} className="video_frame">
+                                    </div>
                                 </div>
-                                <div id={4} className="video_box">
-                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[3]} /> </div>
+                                <div className="video_box">
+                                    <div id={4} className="video_frame">
+                                    </div>
                                 </div>
-                                <div id={5} className="video_box">
-                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.subscribers[4]} /> </div>
+                                <div className="video_box">
+                                    <div id={5} className="video_frame">
+                                    </div>
                                 </div>
                             </div>
                         </div>
