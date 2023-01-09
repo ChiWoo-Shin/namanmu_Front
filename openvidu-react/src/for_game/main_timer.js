@@ -65,9 +65,9 @@ function Main_timer() {
     transitionTimer.current = setInterval(() => {
       if(currentIndex.current === 5){
         console.log("currentIndex.current"+(currentIndex.current))
-        clearInterval(transitionTimer.current)
         setSec(0);
         setMsec("0" + (time.current % 60).toString());
+        clearInterval(transitionTimer.current)
         clearInterval(timer.current)
         return;
       }

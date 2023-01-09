@@ -20,15 +20,6 @@ var contentlist = [
 
 function S_words() {
   let [show, setShow] = useState(contentlist);
-  let [storyteller, setStoryteller] = useState([
-    true,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
-  let [storytellerIDX, setStorytellerIDX] = useState(0);
   let [show_name, setShow_name] = useState("게임을 시작하겠습니다.");
   const [answer, setAnswer] = useState("");
   let [correct, setCorrect] = useState("2");
@@ -99,7 +90,6 @@ function S_words() {
 
   return (
     <>
-      {storyteller[storytellerIDX] === true ? <div>{show_name}</div> : null}
       {inputVisible && (
         <>
           <input
@@ -113,7 +103,7 @@ function S_words() {
             }}
           />
           <Button
-            id="Answer_Sibmit"
+            id="Answer_Submit"
             type="submit"
             onClick={(e) => {
               checkAnser(e);
