@@ -2,6 +2,7 @@ import React, { Component, useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import "./App.css";
 import ReactDOM from "react-dom";
+import { render } from 'react-dom-lite'
 import { Button } from "react-bootstrap";
 import Main_timer from "./for_game/main_timer"; // Timer
 
@@ -36,7 +37,6 @@ class webCam extends Component {
 
         this.joinSession = this.joinSession.bind(this);
         this.leaveSession = this.leaveSession.bind(this);
-        // this.switchCamera = this.switchCamera.bind(this);
         this.handleChangeSessionId = this.handleChangeSessionId.bind(this);
         this.handleChangeUserName = this.handleChangeUserName.bind(this);
         this.handleMainVideoStream = this.handleMainVideoStream.bind(this);
@@ -87,6 +87,26 @@ class webCam extends Component {
         }
     }
 
+    deleteGamer(event) {
+        console.log("delete gamers 진입함")
+        let gamers = this.state.gamers;
+        let index = -1;
+        index = gamers.findIndex((a) => {
+            if (a.name == JSON.parse(event.stream.connection.data).clientData) {
+                return a
+            }
+        })
+
+        if (index > -1) {
+            console.log("delete gamers 동작함")
+            gamers.splice(index, 1);
+            this.setState({
+                gamers: gamers,
+            });
+        }
+    }
+
+
     joinSession() {
         // --- 1) Get an OpenVidu object ---
 
@@ -114,32 +134,35 @@ class webCam extends Component {
                     gamers.push({ name: JSON.parse(event.stream.connection.data).clientData, streamManager: subscriber }); // gamers에 현재 나를 넣음
                     console.log("여기는 created" + JSON.parse(event.stream.connection.data).clientData + " " + subscriber)
 
-
                     gamers.map((a, i) => {
                         console.log("name11111111 : " + a.name + " " + gamers.length + " " + i)
                         console.log(a.streamManager)
                     })
 
-                    // Update the state with the new subscribers
                     this.setState({
                         subscribers: subscribers,
                         gamers: gamers
                     });
 
-                    gamers.map((a, i) => {
-                        const clearElement = () => {
-                            document.getElementById(i).innerHTML = "";
-                        };
-                        ReactDOM.render(
-                            <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[i].streamManager} /></div>,
-                            document.getElementById(i)
-                        );
-                    })
+                    // gamers.map((a, i) => {
+                    //     const clearElement = () => {
+                    //         document.getElementById(i).innerHTML = "";
+                    //     };
+                    //     ReactDOM.render(
+                    //         <>
+                    //             <div className="video_frame"> <UserVideoComponent streamManager={a.streamManager} />
+                    //             </div>
+                    //         </>,
+                    //         document.getElementById(i)
+                    //     );
+                    // })
+
                 });
                 // On every Stream destroyed...
                 mySession.on('streamDestroyed', (event) => {
                     // Remove the stream from 'subscribers' array
                     this.deleteSubscriber(event.stream.streamManager);
+                    this.deleteGamer(event);
                 });
 
                 // On every asynchronous exception...
@@ -197,15 +220,18 @@ class webCam extends Component {
                                 gamers: copy,
                             });
 
-                            gamers.map((a, i) => {
-                                const clearElement = () => {
-                                    document.getElementById(i).innerHTML = "";
-                                };
-                                ReactDOM.render(
-                                    <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[i].streamManager} /></div>,
-                                    document.getElementById(i)
-                                );
-                            })
+                            // gamers.map((a, i) => {
+                            //     const clearElement = () => {
+                            //         document.getElementById(i).innerHTML = "";
+                            //     };
+                            //     ReactDOM.render(
+                            //         <>
+                            //             <div className="video_frame"> <UserVideoComponent streamManager={a.streamManager} />
+                            //             </div>
+                            //         </>,
+                            //         document.getElementById(i)
+                            //     );
+                            // })
 
                         })
                         .catch((error) => {
@@ -233,14 +259,14 @@ class webCam extends Component {
             mySessionId: 'SessionA',
             myUserName: 'Participant' + Math.floor(Math.random() * 100),
             mainStreamManager: undefined,
-            publisher: undefined
+            publisher: undefined,
+            gamers: []
         });
     }
 
     render() {
         const mySessionId = this.state.mySessionId;
         const myUserName = this.state.myUserName;
-
 
         return (
             <div className="container">
@@ -312,14 +338,17 @@ class webCam extends Component {
                                 </div>
                                 <div className="video_box">
                                     <div id={0} className="video_frame">
+                                        {this.state.gamers[0] && <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[0].streamManager} /></div>}
                                     </div>
                                 </div>
                                 <div className="video_box">
                                     <div id={1} className="video_frame">
+                                        {this.state.gamers[1] && <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[1].streamManager} /></div>}
                                     </div>
                                 </div>
                                 <div className="video_box">
                                     <div id={2} className="video_frame">
+                                        {this.state.gamers[2] && <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[2].streamManager} /></div>}
                                     </div>
                                 </div>
                             </div>
@@ -370,14 +399,17 @@ class webCam extends Component {
                                 </div>
                                 <div className="video_box">
                                     <div id={3} className="video_frame">
+                                        {this.state.gamers[3] && <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[3].streamManager} /></div>}
                                     </div>
                                 </div>
                                 <div className="video_box">
                                     <div id={4} className="video_frame">
+                                        {this.state.gamers[4] && <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[4].streamManager} /></div>}
                                     </div>
                                 </div>
                                 <div className="video_box">
                                     <div id={5} className="video_frame">
+                                        {this.state.gamers[5] && <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[5].streamManager} /></div>}
                                     </div>
                                 </div>
                             </div>
