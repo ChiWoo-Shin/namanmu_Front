@@ -302,6 +302,7 @@ class webCam extends Component {
         let message = JSON.parse(event.data);
         timer = message.timer;
       });
+      console.log(timer);
     }
   }
 
