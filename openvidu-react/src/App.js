@@ -281,6 +281,7 @@ class webCam extends Component {
 
   sendTimer() {
     timer = 30;
+    console.log(timer);
     const message = {
       timer: timer,
     };
@@ -290,14 +291,20 @@ class webCam extends Component {
       data: JSON.stringify(message),
     });
   }
-  componentDidMount() {
-    if (this.state.session !== undefined) {
+
+  DidMount() {
+    console.log("되냐?");
+    console.log(this.state.session);
+    if (this.state.session === undefined) {
+      console.log("xxxxxx");
+    } else {
       this.state.session.on("signal:timer", (event) => {
         let message = JSON.parse(event.data);
         timer = message.timer;
       });
     }
   }
+
   render() {
     const mySessionId = this.state.mySessionId;
     const myUserName = this.state.myUserName;
@@ -447,6 +454,7 @@ class webCam extends Component {
                     <S_words />
                   </div>
                   <Button onClick={() => this.sendTimer()}>Send Timer</Button>
+                  <Button onClick={() => this.DidMount()}>동기화</Button>
                   <div>{timer}</div>
                 </div>
               </div>
