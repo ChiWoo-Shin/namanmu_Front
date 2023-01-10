@@ -17,6 +17,8 @@ import axios from 'axios';
 import UserVideoComponent from './UserVideoComponent';
 import S_words from './page_info/S_word';
 
+
+
 const APPLICATION_SERVER_URL = "http://localhost:5000/";
 
 class webCam extends Component {
@@ -45,6 +47,17 @@ class webCam extends Component {
 
     componentDidMount() {
         window.addEventListener('beforeunload', this.onbeforeunload);
+        const url = new URL(window.location.href);
+        const sessionId = url.searchParams.get("sessionId");
+        if (sessionId) {
+            this.setState({
+                myUserName: 'Participant' + Math.floor(Math.random() * 100),
+                mySessionId : sessionId,
+            })
+            this.joinSession();
+        } else {
+            console.log("Invalid Session Link")
+        }
     }
 
     componentWillUnmount() {
@@ -144,19 +157,6 @@ class webCam extends Component {
                         gamers: gamers
                     });
 
-                    // gamers.map((a, i) => {
-                    //     const clearElement = () => {
-                    //         document.getElementById(i).innerHTML = "";
-                    //     };
-                    //     ReactDOM.render(
-                    //         <>
-                    //             <div className="video_frame"> <UserVideoComponent streamManager={a.streamManager} />
-                    //             </div>
-                    //         </>,
-                    //         document.getElementById(i)
-                    //     );
-                    // })
-
                 });
                 // On every Stream destroyed...
                 mySession.on('streamDestroyed', (event) => {
@@ -198,40 +198,30 @@ class webCam extends Component {
                             gamers.push({ name: this.state.myUserName, streamManager: publisher });
                             console.log("여기는 getToken" + this.state.myUserName + " " + publisher)
 
-                            let copy = [...gamers];
-                            copy.sort(function (a, b) {
-                                if (a.name < b.name) {
-                                    return -1
-                                } else if (a.name > b.name) {
-                                    return 1
-                                } else {
-                                    return 0
-                                }
 
-                            });
+                            /* 현재 동작하지 않음 나중에 A, B팀 정해지면 그때 사용가능 할 듯*/
+                            // let copy = [...gamers];
+                            // copy.sort(function (a, b) {
+                            //     if (a.name < b.name) {
+                            //         return -1
+                            //     } else if (a.name > b.name) {
+                            //         return 1
+                            //     } else {
+                            //         return 0
+                            //     }
 
-                            copy.map((a, i) => {
-                                console.log("name22222222 : " + a.name + " " + gamers.length + " " + i)
-                            })
+                            // });
+
+                            // copy.map((a, i) => {
+                            //     console.log("name22222222 : " + a.name + " " + gamers.length + " " + i)
+                            // })
+                            /* -----------------------------------------------*/
 
                             this.setState({
                                 mainStreamManager: publisher,
                                 publisher: publisher,
-                                gamers: copy,
+                                gamers: gamers,
                             });
-
-                            // gamers.map((a, i) => {
-                            //     const clearElement = () => {
-                            //         document.getElementById(i).innerHTML = "";
-                            //     };
-                            //     ReactDOM.render(
-                            //         <>
-                            //             <div className="video_frame"> <UserVideoComponent streamManager={a.streamManager} />
-                            //             </div>
-                            //         </>,
-                            //         document.getElementById(i)
-                            //     );
-                            // })
 
                         })
                         .catch((error) => {
@@ -264,6 +254,19 @@ class webCam extends Component {
         });
     }
 
+    createInvitation() {
+        let sessionId = this.state.mySessionId;
+        let invitationLink = "http://localhost:3000/join?sessionId=" + sessionId;
+        console.log("Invitation link: " + invitationLink);
+        // You can also send this link to the user via email or display it on the page
+
+        navigator.clipboard.writeText(invitationLink).then(() => {
+            alert("Invitation link copied to clipboard");
+        }).catch(() => {
+            console.log("Failed to copy to clipboard.");
+        });
+    }
+
     render() {
         const mySessionId = this.state.mySessionId;
         const myUserName = this.state.myUserName;
@@ -277,6 +280,7 @@ class webCam extends Component {
                         </div>
                         <div id="join-dialog" className="jumbotron vertical-center">
                             <h1> Join a video session </h1>
+
                             <form className="form-group" onSubmit={this.joinSession}>
                                 <p>
                                     <label>Participant: </label>
@@ -311,6 +315,7 @@ class webCam extends Component {
                 {this.state.session !== undefined ? (
                     <div id="session">
                         <div id="session-header">
+                            <button onClick={() => this.createInvitation()}>Create Invitation</button>
                             <h1 id="session-title">{mySessionId}</h1>
                             <input
                                 className="btn btn-large btn-danger"
@@ -366,6 +371,7 @@ class webCam extends Component {
                                 </div>
                                 <div className="main_video_box">
                                     <div className="main_video_frame" id="main_screen">
+                                        {this.state.gamers[3] && <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[3].streamManager} /></div>}
                                         {/* <canvas ref={canvasRef} autoPlay className="Video_myturn" /> */}
                                         {/* <UserVideoComponent streamManager={this.state.mainStreamManager} className="Video_myturn" /> */}
                                     </div>
