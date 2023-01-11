@@ -21,7 +21,7 @@ const useStore = create((set) => ({
   },
 
   //경준
-  cur_time: 6000,
+  cur_time: 1000000,
   settime: (input) => set({ cur_time: input }),
 
   time_state: "no_change",
@@ -32,6 +32,9 @@ const useStore = create((set) => ({
 
   cur_session: undefined,
   set_session_change: (input) => set({ cur_session: input }),
+
+  cur_turn_states: "room",
+  set_turn_state_change: (input) => set({ cur_turn_states: input }),
 }));
 
 export default useStore;
