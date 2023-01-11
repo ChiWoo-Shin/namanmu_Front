@@ -4,13 +4,16 @@ import useStore from "./store";
 import UserVideoComponent from "../UserVideoComponent";
 
 function Main_timer() {
+  const { cur_time, settime, time_state, set_time_change } = useStore();
   const [sec, setSec] = useState(6000);
   const [msec, setMsec] = useState(0);
   const time = useRef(6000);
   const timer = useRef(null);
   const videoBoxes = useRef(null);
   const currentIndex = useRef(0);
-  const { gamers, setGamers, deleteGamer, clearGamer } = useStore(state => state);
+  const { gamers, setGamers, deleteGamer, clearGamer } = useStore(
+    (state) => state
+  );
 
   useEffect(() => {
     timer.current = setInterval(() => {
@@ -26,12 +29,12 @@ function Main_timer() {
     if (time.current < 0) {
       console.log("Time's up!");
       clearInterval(timer.current);
-      setSec(60);
+      setSec(cur_time % 100);
       setMsec(0);
-      time.current = 6000;
-      currentIndex.current +=1;
-      if (currentIndex.current > {gamers}.gamers.length){
-        return ()=> clearInterval(timer.current)
+      time.current = cur_time;
+      currentIndex.current += 1;
+      if (currentIndex.current > { gamers }.gamers.length) {
+        return () => clearInterval(timer.current);
       }
 
       timer.current = setInterval(() => {
@@ -49,25 +52,36 @@ function Main_timer() {
   }, [msec]);
 
   useEffect(() => {
-    videoBoxes.current = document.getElementsByClassName('video_box');
+    videoBoxes.current = document.getElementsByClassName("video_box");
   }, []);
 
   useEffect(() => {
     if (videoBoxes.current) {
-      console.log("gamers : ")
+      console.log("gamers : ");
       if ({ gamers }.gamers[currentIndex.current]) {
         ReactDOM.render(
           // videoBoxes.current[currentIndex.current].style.border = '5px solid red'
-          <UserVideoComponent streamManager={{ gamers }.gamers[currentIndex.current].streamManager}/>,
-          document.getElementById('main_screen')
-        )
-      } 
-      else {
-        document.getElementById('main_screen').innerHTML = ''
+          <UserVideoComponent
+            streamManager={
+              { gamers }.gamers[currentIndex.current].streamManager
+            }
+          />,
+          document.getElementById("main_screen")
+        );
+      } else {
+        document.getElementById("main_screen").innerHTML = "";
       }
     }
   }, [currentIndex.current]);
 
+  useEffect(() => {
+    if (time_state === "change") {
+      time.current = cur_time;
+      setSec(cur_time);
+      setMsec(0);
+      console.log("동기화");
+    }
+  }, [time_state]);
 
   return (
     <center>
