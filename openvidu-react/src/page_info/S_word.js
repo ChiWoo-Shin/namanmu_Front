@@ -2,6 +2,11 @@ import React, { useEffect, useState, useRef } from "react";
 import { Button } from "react-bootstrap";
 import useStore from "../for_game/store";
 
+import useSound from "use-sound";
+
+import good_sound from "../audio/good.mp3";
+import bad_sound from "../audio/bad.mp3";
+
 function S_words() {
   let [show, setShow] = useState([
     "제시어1",
@@ -17,7 +22,11 @@ function S_words() {
   ]);
 
   const { cnt_answer, cnt_plus, cur_session } = useStore();
+
   //ZUSTAND
+  const [good] = useSound(good_sound);
+  const [bad] = useSound(bad_sound);
+  //USE Sound
 
   let [show_name, setShow_name] = useState("게임을 시작하겠습니다.");
   const [answer, setAnswer] = useState("");
@@ -52,6 +61,7 @@ function S_words() {
       sendScore();
       if (showIndex < show.length - 1) {
         nextShow();
+        good();
       }
     }
   }, [number]);
@@ -71,23 +81,35 @@ function S_words() {
     });
   };
 
-  const check_Score = () => {
+  const check_Score = (e) => {
     if (show_name === answer) {
       cnt_plus(cnt_answer + 1);
       setCorrect(0);
+      setAnswer("");
     } else {
       setCorrect(1);
+      bad();
+      setAnswer("");
     }
   };
-
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      check_Score(e);
+    }
+  };
   return (
     <>
       <div>{show_name}</div>
       {inputVisible && (
         <>
           <input
+            id="Answer_input"
+            value={answer}
             onChange={(e) => {
               setAnswer(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              handleKeyPress(e);
             }}
           />
           <Button

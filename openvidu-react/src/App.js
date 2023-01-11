@@ -18,7 +18,7 @@ import UserVideoComponent from "./UserVideoComponent";
 import useStore from "./for_game/store";
 
 const APPLICATION_SERVER_URL = "http://localhost:5000/";
-var timer = 5000;
+var timer = 1000;
 
 class webCam extends Component {
   constructor(props) {
@@ -40,7 +40,6 @@ class webCam extends Component {
     this.handleChangeUserName = this.handleChangeUserName.bind(this);
     this.onbeforeunload = this.onbeforeunload.bind(this);
   }
-
   componentDidMount() {
     //초대링크 타고 들어왔을 때 동작하는 part
     window.addEventListener("beforeunload", this.onbeforeunload);
