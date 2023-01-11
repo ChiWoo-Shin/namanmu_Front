@@ -34,7 +34,6 @@ class webCam extends Component {
       mySessionId: "SessionA",
       myUserName: "Participant" + Math.floor(Math.random() * 100),
       session: undefined,
-      // mainStreamManager: undefined, // Main video of the page. Will be the 'publisher' or one of the 'subscribers'
       publisher: undefined,
       subscribers: [],
     };
@@ -43,7 +42,6 @@ class webCam extends Component {
     this.leaveSession = this.leaveSession.bind(this);
     this.handleChangeSessionId = this.handleChangeSessionId.bind(this);
     this.handleChangeUserName = this.handleChangeUserName.bind(this);
-    // this.handleMainVideoStream = this.handleMainVideoStream.bind(this);
     this.onbeforeunload = this.onbeforeunload.bind(this);
   }
 
@@ -82,16 +80,16 @@ class webCam extends Component {
     });
   }
 
-  deleteSubscriber(streamManager) {
-    let subscribers = this.state.subscribers;
-    let index = subscribers.indexOf(streamManager, 0);
-    if (index > -1) {
-      subscribers.splice(index, 1);
-      this.setState({
-        subscribers: subscribers,
-      });
-    }
-  }
+  // deleteSubscriber(streamManager) {
+  //   let subscribers = this.state.subscribers;
+  //   let index = subscribers.indexOf(streamManager, 0);
+  //   if (index > -1) {
+  //     subscribers.splice(index, 1);
+  //     this.setState({
+  //       subscribers: subscribers,
+  //     });
+  //   }
+  // }
 
   joinSession() {
     // --- 1) Get an OpenVidu object ---
@@ -114,28 +112,40 @@ class webCam extends Component {
           // so OpenVidu doesn't create an HTML video by its own
           var subscriber = mySession.subscribe(event.stream, undefined); // 현재 내 정보를 subscribe하고
           var subscribers = this.state.subscribers; // 현재 state.subscribers에 있는 것을 subscribers에 넣고
-          subscribers.push(subscriber); // subscribers에 subscriber(나) 를 집어 넣음
-
-          useStore.getState().setGamers({
-            name: JSON.parse(event.stream.connection.data).clientData,
-            streamManager: subscriber,
-          })
-          console.log( "subscriber setGamers : after")
-          console.log( useStore.getState().gamers)
-          console.log( useStore.getState().gamers[0].name)
-          console.log( useStore.getState().gamers[0].streamManager)
+          
+          const addSubscriber = (subscriber, subscribers) =>{
+            
+            subscribers.push(subscriber); // subscribers에 subscriber(나) 를 집어 넣음
+            useStore.getState().setGamers({
+              name: JSON.parse(event.stream.connection.data).clientData,
+              streamManager: subscriber,
+            });
+            return subscribers;
+          }
 
           this.setState({
-            subscribers: subscribers,
+            subscribers: addSubscriber(subscriber,subscribers),
           });
 
         });
         // On every Stream destroyed...
         mySession.on("streamDestroyed", (event) => {
-          // Remove the stream from 'subscribers' array
-          this.deleteSubscriber(event.stream.streamManager);
-          // this.deleteGamer(JSON.parse(event.stream.connection.data).clientData);
-          useStore.getState().deleteGamer(JSON.parse(event.stream.connection.data).clientData)
+          var subscribers = this.state.subscribers;
+          const deleteSubscriber = (streamManager, subscribers) => {
+            let index = subscribers.indexOf(streamManager, 0);
+            useStore.getState().deleteGamer(JSON.parse(event.stream.connection.data).clientData)
+            if (index > -1) {
+              subscribers.splice(index, 1);
+              return subscribers;
+            }
+          }
+
+          this.setState({
+            subscribers: deleteSubscriber(event.stream.streamManager, this.state.subscribers)
+          });
+
+          // this.deleteSubscriber(event.stream.streamManager);
+          // useStore.getState().deleteGamer(JSON.parse(event.stream.connection.data).clientData)
         });
 
         // On every asynchronous exception...
@@ -167,19 +177,14 @@ class webCam extends Component {
               });
               // --- 6) Publish your stream ---
               mySession.publish(publisher);
+              console.log("publisher" + useStore.getState().gamers)
 
               useStore.getState().setGamers({
                 name: this.state.myUserName,
                 streamManager: publisher,
               })
 
-              console.log( "publisher setGamers : after")
-              console.log( useStore.getState().gamers)
-              console.log( useStore.getState().gamers[0].name)
-              console.log( useStore.getState().gamers[0].streamManager)
-
               this.setState({
-                // mainStreamManager: publisher,
                 publisher: publisher,
               });
 
@@ -205,8 +210,6 @@ class webCam extends Component {
     }
     
     useStore.getState().clearGamer()
-    console.log("leaveSession : ")
-    console.log(useStore.getState().gamers)
     // Empty all properties...
     this.OV = null;
     this.setState({
@@ -224,7 +227,6 @@ class webCam extends Component {
     console.log(timer);
     const message = {
       timer: timer,
-
     };
 
     this.state.session.signal({
