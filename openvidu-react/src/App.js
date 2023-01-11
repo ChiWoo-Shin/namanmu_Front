@@ -221,6 +221,7 @@ class webCam extends Component {
     return (
       <div className="maing_bg">
         <div className="container">
+
           {this.state.session === undefined ? (
             <div id="join">
               {/* <div id="img-div">

@@ -49,6 +49,7 @@ function Main_timer() {
     videoBoxes.current = document.getElementsByClassName("video_box");
   }, []);
 
+
   useEffect(() => {
     if (time_state === "change") {
       time.current = cur_time;
@@ -93,16 +94,19 @@ function Main_timer() {
     <>
       <div className="team_box">
         <div className="team_turn">
+
           <center>
             <h3>
               상태 : {cur_turn_states} Timer : {sec}.{msec}{" "}
               {currentIndex.current}
             </h3>
           </center>
+
         </div>
       </div>
       <div className="main_video_box">
         <div id="main_screen" className="main_video_frame">
+
           {{ gamers }.gamers[currentIndex.current] && (
             <UserVideoComponent
               streamManager={
@@ -110,6 +114,7 @@ function Main_timer() {
               }
             />
           )}
+
         </div>
       </div>
     </>
