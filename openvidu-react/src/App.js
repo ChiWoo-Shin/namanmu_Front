@@ -368,7 +368,11 @@ class webCam extends Component {
                   <div className="team_turn">
                     <h1>
                       {/* <center>  */}
-                      <Main_timer />
+                      {
+                      (useStore.getState().gamers[0] || useStore.getState().gamers[1] ||
+                      useStore.getState().gamers[2] || useStore.getState().gamers[3] ||
+                      useStore.getState().gamers[4] || useStore.getState().gamers[5])
+                       && <Main_timer />}
                       {/* </center> */}
                     </h1>
                   </div>
