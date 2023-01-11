@@ -1,4 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
+import ReactDOM from "react-dom";
+// import { useDispatch, useSelector } from 'react-redux';
+import useStore from "./store";
+import UserVideoComponent from "../UserVideoComponent";
 
 function Main_timer() {
   // const [min, setMin] = useState(3);
@@ -8,9 +12,11 @@ function Main_timer() {
   const timer = useRef(null);
   const videoBoxes = useRef(null);
   const currentIndex = useRef(0);
-  const [currentRound, setCurrentRound] = useState(0);
+  const {gamers, setGamers, deleteGamer, clearGamer} = useStore(state => state);
 
-  const totalRounds = 5
+  //치우형 안녕 우리 팀장을 잘부탁해 부롱부부롱부롱  
+  // const [currentRound, setCurrentRound] = useState(0);
+  // const totalRounds = 5
 
   useEffect(() => {
     timer.current = setInterval(() => {
@@ -40,24 +46,23 @@ function Main_timer() {
   useEffect(() => {
     if (videoBoxes.current) {
       videoBoxes.current[currentIndex.current].style.border = '5px solid red';
+      
+      
     }
   }, [currentIndex.current]);
 
-  // useEffect(() => {
-  //   if (videoBoxes.current) {
-  //     if (currentRound < totalRounds) {
-  //       videoBoxes.current[currentIndex.current].style.border = 'none';
-  //       currentIndex.current = (currentIndex.current + 1) % videoBoxes.current.length;
-  //       videoBoxes.current[currentIndex.current].style.border = '5px solid red';
-  //       setCurrentRound(currentRound+1)
-  //       console.log(currentRound)
-        
-  //     } else {
-  //       clearInterval(timer.current);
-  //     }
+  useEffect(()=>{
+    if({gamers}.length>0){
+      console.log("gamers : ")
+      console.log({gamers})
       
-  //   }
-  // }, [sec]);
+      ReactDOM.render(
+        <UserVideoComponent streamManager={{gamers}[currentIndex.current].streamManager} />,
+        document.getElementById('main_screen')
+      )
+    }
+  }, [{gamers}])
+
 
   const transitionTimer = useRef(null);
   
@@ -75,20 +80,33 @@ function Main_timer() {
         console.log("currentIndex.current"+(currentIndex.current))
         videoBoxes.current[currentIndex.current].style.border = 'none';
         currentIndex.current = (currentIndex.current - 2) % videoBoxes.current.length;
-        videoBoxes.current[currentIndex.current].style.border = '5px solid red';       
+        videoBoxes.current[currentIndex.current].style.border = '5px solid red';
+        
+        // ReactDOM.render(
+        //   <UserVideoComponent streamManager={gamers[currentIndex.current].streamManager} />,
+        //   document.getElementById('main_screen')
+        // )
       }
       else if (videoBoxes.current && currentIndex.current < 3){
         console.log("currentIndex.current"+(currentIndex.current))
         videoBoxes.current[currentIndex.current].style.border = 'none';
         currentIndex.current = (currentIndex.current + 3) % videoBoxes.current.length;
         videoBoxes.current[currentIndex.current].style.border = '5px solid red';
+
+        // ReactDOM.render(
+        //   <UserVideoComponent streamManager={gamers[currentIndex.current].streamManager} />,
+        //   document.getElementById('main_screen')
+        // )
       }
       // Reset main timer
       time.current = 6000;
       setSec(6000);
+      
     }, 60000);
   
   }, []);
+
+
 
   return (
     <center>
