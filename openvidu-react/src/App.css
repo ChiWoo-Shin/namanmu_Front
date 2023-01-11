@@ -196,3 +196,8 @@
 	border: 3px solid green;
   }
   
+  .main_bg{
+	background-image: url("../public/resources/images/GGMM_main.jpg");
+	background-size: cover;
+	background-position: center;
+  }

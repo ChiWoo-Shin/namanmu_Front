@@ -55,24 +55,6 @@ function Main_timer() {
     videoBoxes.current = document.getElementsByClassName("video_box");
   }, []);
 
-  useEffect(() => {
-    if (videoBoxes.current) {
-      console.log("gamers : ");
-      if ({ gamers }.gamers[currentIndex.current]) {
-        ReactDOM.render(
-          // videoBoxes.current[currentIndex.current].style.border = '5px solid red'
-          <UserVideoComponent
-            streamManager={
-              { gamers }.gamers[currentIndex.current].streamManager
-            }
-          />,
-          document.getElementById("main_screen")
-        );
-      } else {
-        document.getElementById("main_screen").innerHTML = "";
-      }
-    }
-  }, [currentIndex.current]);
 
   useEffect(() => {
     if (time_state === "change") {
@@ -84,9 +66,22 @@ function Main_timer() {
   }, [time_state]);
 
   return (
-    <center>
-      Timer : {sec}.{msec}
-    </center>
+    <>
+      <div className="team_box">
+        <div className="team_turn">
+          <h1>
+            <center>
+              Timer : {sec}.{msec}
+            </center>
+          </h1>
+        </div>
+      </div>
+      <div className="main_video_box">
+        <div id="main_screen" className="main_video_frame">
+        {{ gamers }.gamers[currentIndex.current] && <UserVideoComponent streamManager={{ gamers }.gamers[currentIndex.current].streamManager} />}
+        </div>
+      </div>
+    </>
   );
 }
 
