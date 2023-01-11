@@ -20,7 +20,7 @@ import S_words from "./page_info/S_word";
 
 // Zustand
 import useStore from "./for_game/store";
-
+import CreateInvitation from "./page_info/CreateInvitation";
 
 const APPLICATION_SERVER_URL = "http://localhost:5000/";
 var timer = 10;
@@ -81,14 +81,6 @@ class webCam extends Component {
       myUserName: e.target.value,
     });
   }
-
-  // handleMainVideoStream(stream) {
-  //   if (this.state.mainStreamManager !== stream) {
-  //     this.setState({
-  //       mainStreamManager: stream,
-  //     });
-  //   }
-  // }
 
   deleteSubscriber(streamManager) {
     let subscribers = this.state.subscribers;
@@ -255,19 +247,6 @@ class webCam extends Component {
     }
   }
 
-  createInvitation() {
-    let sessionId = this.state.mySessionId;
-    let invitationLink = "http://localhost:3000/join?sessionId=" + sessionId;
-    console.log("Invitation link: " + invitationLink);
-    // You can also send this link to the user via email or display it on the page
-
-    navigator.clipboard.writeText(invitationLink).then(() => {
-      alert("Invitation link copied to clipboard");
-    }).catch(() => {
-      console.log("Failed to copy to clipboard.");
-    });
-  }
-
   render() {
     const mySessionId = this.state.mySessionId;
     const myUserName = this.state.myUserName;
@@ -316,7 +295,7 @@ class webCam extends Component {
         {this.state.session !== undefined ? (
           <div id="session">
             <div id="session-header">
-              <button onClick={() => this.createInvitation()}>초대 링크 복사</button>
+              <CreateInvitation mySessionId={mySessionId}/>
               <h1 id="session-title">{mySessionId}</h1>
               <input
                 className="btn btn-large btn-danger"
