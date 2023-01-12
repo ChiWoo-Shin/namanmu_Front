@@ -13,7 +13,7 @@ import Main_timer from "./for_game/main_timer";
 // webRTC
 import { OpenVidu } from "openvidu-browser";
 import UserVideoComponent from "./UserVideoComponent";
-
+import Score_board from "./page_info/score_board";
 // Zustand
 import useStore from "./for_game/store";
 
@@ -29,7 +29,6 @@ class webCam extends Component {
       mySessionId: "SessionA",
       myUserName: "Participant" + Math.floor(Math.random() * 100),
       session: undefined,
-
       publisher: undefined,
       subscribers: [],
     };
@@ -40,6 +39,7 @@ class webCam extends Component {
     this.handleChangeUserName = this.handleChangeUserName.bind(this);
     this.onbeforeunload = this.onbeforeunload.bind(this);
   }
+
   componentDidMount() {
     //초대링크 타고 들어왔을 때 동작하는 part
     window.addEventListener("beforeunload", this.onbeforeunload);
@@ -62,12 +62,19 @@ class webCam extends Component {
       let message = JSON.parse(event.data);
       useStore.getState().settime(message.timer);
       useStore.getState().set_time_change("change");
+      useStore.getState().set_cur_round(1);
     });
     //점수 동기화
     this.state.session.on("signal:score", (event) => {
       let message = JSON.parse(event.data);
       console.log("시그널 확인(score) : " + message.score);
       useStore.getState().cnt_plus(message.score);
+      if (useStore.getState().cur_who_turn === "red") {
+        useStore.getState().set_CurRed_cnt(message.score);
+      }
+      if (useStore.getState().cur_who_turn === "blue") {
+        useStore.getState().set_CurBlue_cnt(message.score);
+      }
     });
   }
   componentWillUnmount() {
@@ -162,12 +169,12 @@ class webCam extends Component {
                 name: this.state.myUserName,
                 streamManager: publisher,
               });
-
+              useStore.getState().set_myUserID(this.state.myUserName);
               console.log("publisher setGamers : after");
               console.log(useStore.getState().gamers);
               console.log(useStore.getState().gamers[0].name);
               console.log(useStore.getState().gamers[0].streamManager);
-
+              console.log("id is :  " + useStore.getState().myUserID);
               this.setState({
                 publisher: publisher,
               });
@@ -221,7 +228,6 @@ class webCam extends Component {
     return (
       <div className="maing_bg">
         <div className="container">
-
           {this.state.session === undefined ? (
             <div id="join">
               {/* <div id="img-div">
@@ -286,12 +292,12 @@ class webCam extends Component {
                   <div className="score_box">
                     <div className="box">
                       <div className="Score" id="A_currentScore">
-                        현재 라운드 점수
+                        Current : <Score_board score={"cur_red"} />
                       </div>
                     </div>
                     <div className="box">
                       <div className="Score" id="A_totalScore">
-                        총 점수
+                        Total : <Score_board score={"total_red"} />
                       </div>
                     </div>
                   </div>
@@ -360,33 +366,29 @@ class webCam extends Component {
 												<Button onClick={renderCam3}>퍼즐(4)</Button> */}
                       </div>
                     </div>
-                    {/* {state.S_words_Q[i]} */}
+
                     <div>
                       <S_words />
                     </div>
                     <Button onClick={() => this.sendTimer()}>Send Timer</Button>
-                    <div>{timer}</div>
                   </div>
                 </div>
                 {/* B팀 프레임 */}
                 <div className="b-screen">
                   <div className="box">
-                    <div className="Score" id="A_currentScore">
-                      현재 라운드 점수
+                    <div className="Score" id="B_totalScore">
+                      Total :
+                      <Score_board score={"total_blue"} />
                     </div>
                   </div>
                   <div className="box">
-                    <div className="Score" id="A_totalScore">
-                      총 점수
+                    <div className="Score" id="B_currentScore">
+                      Current :
+                      <Score_board score={"cur_blue"} />
                     </div>
                   </div>
                   <div className="video_box">
                     <div id={3} className="video_frame">
-                      {/* {this.state.gamers[3] && (
-                      <div className="video_frame">
-                        <UserVideoComponent streamManager={this.state.gamers[3].streamManager} />
-                      </div>
-                    )} */}
                       {useStore.getState().gamers[3] && (
                         <div className="video_frame">
                           {" "}
@@ -420,11 +422,6 @@ class webCam extends Component {
                   </div>
                   <div className="video_box">
                     <div id={5} className="video_frame">
-                      {/* {this.state.gamers[5] && (
-                      <div className="video_frame">
-                        <UserVideoComponent streamManager={this.state.gamers[5].streamManager} />
-                      </div>
-                    )} */}
                       {useStore.getState().gamers[5] && (
                         <div className="video_frame">
                           {" "}
