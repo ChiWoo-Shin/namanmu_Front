@@ -14,6 +14,16 @@ function Main_timer() {
   const { curRed_total, set_CurRed_total, curBlue_total, set_CurBlue_total } =
     useStore();
   const { is_my_turn, set_my_turn } = useStore();
+  const { is_my_team_turn, set_myteam_turn } = useStore();
+
+  const {
+    myUserID,
+    gamers,
+    my_index,
+    set_my_index,
+    player_count,
+    set_player_count,
+  } = useStore((state) => state);
 
   const [sec, setSec] = useState(0);
   const [msec, setMsec] = useState(0);
@@ -21,9 +31,6 @@ function Main_timer() {
   const timer = useRef(null);
   const videoBoxes = useRef(null);
   const currentIndex = useRef(0);
-  const { myUserID, gamers, setGamers, deleteGamer, clearGamer } = useStore(
-    (state) => state
-  );
 
   useEffect(() => {
     timer.current = setInterval(() => {
@@ -92,8 +99,36 @@ function Main_timer() {
     } else {
       set_my_turn(false);
     }
+    if (my_index < 3 && currentIndex.current < 3) {
+      set_myteam_turn(true);
+    } else if (my_index >= 3 && currentIndex.current >= 3) {
+      set_myteam_turn(true);
+    } else {
+      set_myteam_turn(false);
+    }
   }, [currentIndex.current]);
 
+  useEffect(() => {
+    console.log("팀 바꼈냐?" + is_my_team_turn);
+  }, [is_my_team_turn]);
+
+  useEffect(() => {
+    console.log("게이머 정보 변경 or 추가");
+    set_player_count(player_count + 1);
+  }, [gamers]);
+
+  useEffect(() => {
+    for (var i = 0; i < player_count; i++) {
+      console.log("player count :" + player_count);
+      if (myUserID === { gamers }.gamers[i].name) {
+        console.log("나의 인덱스 :" + i);
+        set_my_index(i);
+      }
+    }
+  }, [player_count]);
+  useEffect(() => {
+    console.log("인덱스 변경" + my_index);
+  }, [my_index]);
   const game_loop = () => {
     if (cur_turn_states === "ready") {
       time.current = 1500;
@@ -140,9 +175,9 @@ function Main_timer() {
         <div className="team_turn">
           <center>
             <h6>
-              상태 : {cur_turn_states} Timer : {sec}.{msec}{" "}
+              상태 : {cur_turn_states} Timer : {sec}.{msec}
               {currentIndex.current}, round : {cur_round} turn : {cur_who_turn}
-              is my turn : {is_my_turn}
+              is my turn : {is_my_turn}, 내 인덱스 : {my_index}
             </h6>
           </center>
         </div>

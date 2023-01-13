@@ -58,24 +58,26 @@ class webCam extends Component {
 
   componentDidUpdate() {
     //타이머 동기화
-    this.state.session.on("signal:timer", (event) => {
-      let message = JSON.parse(event.data);
-      useStore.getState().settime(message.timer);
-      useStore.getState().set_time_change("change");
-      useStore.getState().set_cur_round(1);
-    });
-    //점수 동기화
-    this.state.session.on("signal:score", (event) => {
-      let message = JSON.parse(event.data);
-      console.log("시그널 확인(score) : " + message.score);
-      useStore.getState().cnt_plus(message.score);
-      if (useStore.getState().cur_who_turn === "red") {
-        useStore.getState().set_CurRed_cnt(message.score);
-      }
-      if (useStore.getState().cur_who_turn === "blue") {
-        useStore.getState().set_CurBlue_cnt(message.score);
-      }
-    });
+    if (this.state.session !== undefined) {
+      this.state.session.on("signal:timer", (event) => {
+        let message = JSON.parse(event.data);
+        useStore.getState().settime(message.timer);
+        useStore.getState().set_time_change("change");
+        useStore.getState().set_cur_round(1);
+      });
+      //점수 동기화
+      this.state.session.on("signal:score", (event) => {
+        let message = JSON.parse(event.data);
+        console.log("시그널 확인(score) : " + message.score);
+        useStore.getState().cnt_plus(message.score);
+        if (useStore.getState().cur_who_turn === "red") {
+          useStore.getState().set_CurRed_cnt(message.score);
+        }
+        if (useStore.getState().cur_who_turn === "blue") {
+          useStore.getState().set_CurBlue_cnt(message.score);
+        }
+      });
+    }
   }
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.onbeforeunload);
