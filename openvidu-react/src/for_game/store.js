@@ -19,18 +19,25 @@ const useStore = create((set) => ({
       gamers: [],
     }));
   },
+  setPublishAudio: (name, newValue) => {
+    set((state) => {
+      const gamer = state.gamers.find((x) => x.name === name);
+      gamer.streamManager.publishAudio = newValue;
+      return { gamers: state.gamers };
+    });
+  },
 
   myUserID: "none",
   set_myUserID: (input) => set({ myUserID: input }),
   //경준
   cur_time: 1000000,
-  settime: (input) => set({ cur_time: input }),
+  set_Curtime: (input) => set({ cur_time: input }),
 
   time_state: "no_change",
   set_time_change: (input) => set({ time_state: input }),
 
   cnt_answer: 0,
-  cnt_plus: (input) => set(() => ({ cnt_answer: input })),
+  set_CntAns: (input) => set(() => ({ cnt_answer: input })),
 
   //Team 별  round 점수
   curRed_cnt: 0,

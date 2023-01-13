@@ -73,7 +73,7 @@ const ItemThreeCut = ({ videoRef }) => {
           );
           ctx.setTransform(1, 0, 0, 1, 0, 0);
           console.log("세번째 아이템 작동합니다.");
-          setTimeout(drawFrame, 50);
+          set_Curtimeout(drawFrame, 50);
         }
       }
       drawFrame();

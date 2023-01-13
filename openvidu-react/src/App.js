@@ -9,6 +9,9 @@ import CreateInvitation from "./page_info/CreateInvitation";
 import Main_timer from "./for_game/main_timer";
 
 //Item list
+import ItemOneBlur from "./item_info/Item_1_blur";
+import ItemTwoDecal from "./item_info/Item_2_decalco";
+import ItemThreeCut from "./item_info/Item_3_4cut";
 
 // webRTC
 import { OpenVidu } from "openvidu-browser";
@@ -61,7 +64,7 @@ class webCam extends Component {
     if (this.state.session !== undefined) {
       this.state.session.on("signal:timer", (event) => {
         let message = JSON.parse(event.data);
-        useStore.getState().settime(message.timer);
+        useStore.getState().set_Curtime(message.timer);
         useStore.getState().set_time_change("change");
         useStore.getState().set_cur_round(1);
       });
@@ -69,7 +72,7 @@ class webCam extends Component {
       this.state.session.on("signal:score", (event) => {
         let message = JSON.parse(event.data);
         console.log("시그널 확인(score) : " + message.score);
-        useStore.getState().cnt_plus(message.score);
+        useStore.getState().set_CntAns(message.score);
         if (useStore.getState().cur_who_turn === "red") {
           useStore.getState().set_CurRed_cnt(message.score);
         }
@@ -158,7 +161,7 @@ class webCam extends Component {
               let publisher = await this.OV.initPublisherAsync(undefined, {
                 audioSource: undefined, // The source of audio. If undefined default microphone
                 videoSource: undefined, // The source of video. If undefined default webcam
-                publishAudio: false, // Whether you want to start publishing with your audio unmuted or not
+                publishAudio: true, // Whether you want to start publishing with your audio unmuted or not
                 publishVideo: true, // Whether you want to start publishing with your video enabled or not
                 resolution: "640x480", // The resolution of your video
                 frameRate: 30, // The frame rate of your video
@@ -166,7 +169,6 @@ class webCam extends Component {
                 mirror: true, // Whether to mirror your local video or not
               });
               mySession.publish(publisher);
-
               useStore.getState().setGamers({
                 name: this.state.myUserName,
                 streamManager: publisher,
@@ -232,12 +234,6 @@ class webCam extends Component {
         <div className="container">
           {this.state.session === undefined ? (
             <div id="join">
-              {/* <div id="img-div">
-            
-            </div> */}
-              {/* <div id="join-dialog" className="jumbotron vertical-center"> */}
-              {/* <h1> Join a video session </h1> */}
-
               <form className="form-group" onSubmit={this.joinSession}>
                 <p>
                   <label>Participant: </label>
@@ -359,6 +355,10 @@ class webCam extends Component {
                   <div>
                     <div className="team_box">
                       <div className="team_turn"></div>
+                      {/* <Button onClick={renderCam4}>원본</Button>
+                      <Button onClick={renderCam}>blur</Button>
+                      <Button onClick={renderCam2}>좌좌우우</Button>
+                      <Button onClick={renderCam3}>퍼즐(4)</Button> */}
                     </div>
 
                     <div>
