@@ -99,13 +99,6 @@ function Main_timer() {
     } else {
       set_my_turn(false);
     }
-    if (my_index < 3 && currentIndex.current < 3) {
-      set_myteam_turn(true);
-    } else if (my_index >= 3 && currentIndex.current >= 3) {
-      set_myteam_turn(true);
-    } else {
-      set_myteam_turn(false);
-    }
   }, [currentIndex.current]);
 
   useEffect(() => {
@@ -149,16 +142,21 @@ function Main_timer() {
         return () => clearInterval(timer.current);
       } else if (currentIndex.current == player_count - 1) {
         currentIndex.current = 0;
-        set_who_turn("red");
+        if (currentIndex.current % 2 == 0) {
+          set_who_turn("blue");
+        } else {
+          set_who_turn("red");
+          set_cur_round(cur_round + 1);
+        }
       } else if (currentIndex.current % 2 == 0) {
         currentIndex.current += 1;
         set_who_turn("blue");
-        console.log("라운드" + cur_round);
       } else if (currentIndex.current % 2 == 1) {
         currentIndex.current += 1;
         set_who_turn("red");
-        console.log("라운드" + cur_round);
+        set_cur_round(cur_round + 1);
       }
+      cnt_plus(0);
     } else if (cur_turn_states === "first_ready") {
       time.current = 1000;
       set_who_turn("red");
