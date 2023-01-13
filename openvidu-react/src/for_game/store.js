@@ -72,6 +72,14 @@ const useStore = create((set) => ({
 
   player_count: 0,
   set_player_count: (input) => set({ player_count: input }),
+
+  gamerWords: [],
+  fetchGamerWords: async () => {
+      const response = await axios.get(APPLICATION_SERVER_URL + 'api/sessions/game', {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      response && set((state) => ({ gamerWords: (state.gamerWords = response.data) }));
+  }
 }));
 
 export default useStore;

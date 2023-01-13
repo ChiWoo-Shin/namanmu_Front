@@ -8,18 +8,9 @@ import good_sound from "../audio/good.mp3";
 import bad_sound from "../audio/bad.mp3";
 
 function S_words() {
-  let [show, setShow] = useState([
-    "제시어1",
-    "제시어2",
-    "제시어3",
-    "제시어4",
-    "제시어5",
-    "제시어6",
-    "제시어7",
-    "제시어8",
-    "제시어9",
-    "제시어10",
-  ]);
+
+  let [show, setShow] = useState([]);
+
 
   const { cnt_answer, set_CntAns, cur_session, cur_turn_states } = useStore();
   const {
@@ -30,6 +21,7 @@ function S_words() {
     myUserID,
     gamers,
   } = useStore();
+  const { gamerWords, fetchGamerWords } = useStore();
   //ZUSTAND
 
   const [good] = useSound(good_sound);
@@ -43,11 +35,32 @@ function S_words() {
 
   const [showIndex, setShowIndex] = useState(0);
   const [my_team_turn, set_my_team_turn] = useState(false);
-  useEffect(() => {
-    if (cur_turn_states === "game") {
-      setShow_name(show[0]);
+
+  useEffect(async ()=>{
+    if (cur_round !==0){
+      setShow([]);
+      await fetchGamerWords();
     }
-  }, [cur_turn_states]);
+    
+  },[cur_round]);
+
+  useEffect(() => {
+
+    setShow(show.concat(gamerWords.map(a => a.name)));
+    console.log("show time")
+    console.log(show[showIndex])
+  }, [gamerWords])
+  
+  useEffect(()=>{
+    setShow_name(show[showIndex]);
+  },[show])
+
+  // useEffect(() => {
+  //   if (cur_turn_states === "game") {
+  //     setShow_name(show[0]);
+  //   }
+  // }, [cur_turn_states]);
+
 
   useEffect(() => {
     setNumber(cnt_answer);

@@ -21,6 +21,7 @@ import Score_board from "./page_info/score_board";
 import useStore from "./for_game/store";
 
 const APPLICATION_SERVER_URL = "http://localhost:5000/";
+// const APPLICATION_SERVER_URL = 'https://practiceggmm.shop/';
 var timer = 1000;
 
 class webCam extends Component {
@@ -29,7 +30,7 @@ class webCam extends Component {
 
     // These properties are in the state's component in order to re-render the HTML whenever their values change
     this.state = {
-      mySessionId: "SessionA",
+      mySessionId: "Session" + Math.floor(Math.random() * 100),
       myUserName: "Participant" + Math.floor(Math.random() * 100),
       session: undefined,
       publisher: undefined,
@@ -129,6 +130,7 @@ class webCam extends Component {
             subscribers: addSubscriber(subscriber, subscribers),
           });
         });
+
         mySession.on("streamDestroyed", (event) => {
           var subscribers = this.state.subscribers;
           const deleteSubscriber = (streamManager, subscribers) => {
@@ -149,6 +151,7 @@ class webCam extends Component {
             ),
           });
         });
+
         mySession.on("exception", (exception) => {
           console.warn(exception);
         });
@@ -208,7 +211,7 @@ class webCam extends Component {
     this.setState({
       session: undefined,
       subscribers: [],
-      mySessionId: "SessionA",
+      mySessionId: "Session" + Math.floor(Math.random() * 100),
       myUserName: "Participant" + Math.floor(Math.random() * 100),
       publisher: undefined,
     });
