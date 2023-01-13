@@ -48,14 +48,23 @@ const useStore = create((set) => ({
   cur_turn_states: "room",
   set_turn_state_change: (input) => set({ cur_turn_states: input }),
 
-  cur_who_turn: "none",
+  cur_who_turn: "none", //누구 턴인지
   set_who_turn: (input) => set({ cur_who_turn: input }),
 
   cur_round: 0,
   set_cur_round: (input) => set({ cur_round: input }),
 
-  is_my_turn: false,
+  is_my_turn: false, //내가 이야기 꾼인지?
   set_my_turn: (input) => set({ is_my_turn: input }),
+
+  is_my_team_turn: false,
+  set_myteam_turn: (input) => set({ is_my_team_turn: input }),
+
+  my_index: 10000,
+  set_my_index: (input) => set({ my_index: input }),
+
+  player_count: 0,
+  set_player_count: (input) => set({ player_count: input }),
 }));
 
 export default useStore;
