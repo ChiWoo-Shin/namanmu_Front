@@ -37,7 +37,7 @@ const ItemOneBlur = ({ videoRef }) => {
           ctx.drawImage(videoRef.current, 0, 0);
           ctx.setTransform(1, 0, 0, 1, 0, 0);
           ctx.filter = "none";
-          setTimeout(drawFrame, 50);
+          set_Curtimeout(drawFrame, 50);
         }
       }
       drawFrame();
