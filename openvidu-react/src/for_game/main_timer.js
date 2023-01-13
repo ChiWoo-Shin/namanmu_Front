@@ -4,8 +4,8 @@ import useStore from "./store";
 import UserVideoComponent from "../UserVideoComponent";
 
 function Main_timer() {
-  const { cnt_answer, cnt_plus } = useStore();
-  const { cur_time, settime, time_state, set_time_change } = useStore();
+  const { set_CntAns } = useStore();
+  const { cur_time, time_state, set_time_change } = useStore();
   const { cur_turn_states, set_turn_state_change, cur_who_turn, set_who_turn } =
     useStore();
   const { cur_round, set_cur_round } = useStore();
@@ -14,7 +14,7 @@ function Main_timer() {
   const { curRed_total, set_CurRed_total, curBlue_total, set_CurBlue_total } =
     useStore();
   const { is_my_turn, set_my_turn } = useStore();
-  const { is_my_team_turn, set_myteam_turn } = useStore();
+  const { is_my_team_turn, set_myteam_turn, setPublishAudio } = useStore();
 
   const {
     myUserID,
@@ -23,14 +23,14 @@ function Main_timer() {
     set_my_index,
     player_count,
     set_player_count,
-  } = useStore((state) => state);
+  } = useStore();
 
   const [sec, setSec] = useState(0);
   const [msec, setMsec] = useState(0);
   const time = useRef(0);
   const timer = useRef(null);
   const videoBoxes = useRef(null);
-  const currentIndex = useRef(0);
+  const currentIndex = useRef(10000);
 
   useEffect(() => {
     timer.current = setInterval(() => {
@@ -91,20 +91,25 @@ function Main_timer() {
       set_CurRed_cnt(0);
     }
   }, [cur_round]);
-
   useEffect(() => {
-    console.log("게이머 :" + { gamers }.gamers[currentIndex.current].name);
-    if (myUserID === { gamers }.gamers[currentIndex.current].name) {
-      set_my_turn(true);
-    } else {
-      set_my_turn(false);
+    if (cur_turn_states !== "room") {
+      if (is_my_turn === true) {
+        setPublishAudio(myUserID, false);
+        console.log("내 턴이라 오디오 꺼진다아아");
+      } else if (is_my_turn === false) {
+        setPublishAudio(myUserID, true);
+        console.log("내 턴 끝났다아아아아");
+      }
     }
-    if (my_index < 3 && currentIndex.current < 3) {
-      set_myteam_turn(true);
-    } else if (my_index >= 3 && currentIndex.current >= 3) {
-      set_myteam_turn(true);
-    } else {
-      set_myteam_turn(false);
+  }, [is_my_turn]);
+  useEffect(() => {
+    console.log("지금 인덱스는 :" + currentIndex.current);
+    if (currentIndex.current < 10) {
+      if (myUserID === { gamers }.gamers[currentIndex.current].name) {
+        set_my_turn(true);
+      } else {
+        set_my_turn(false);
+      }
     }
   }, [currentIndex.current]);
 
@@ -126,7 +131,6 @@ function Main_timer() {
       }
     }
   }, [player_count]);
-  
   useEffect(() => {
     console.log("인덱스 변경" + my_index);
   }, [my_index]);
@@ -136,36 +140,37 @@ function Main_timer() {
       setSec(15);
       setMsec(0);
       set_turn_state_change("game");
-    } else if (cur_turn_states === "select_theme") {
-      time.current = 500;
-      setSec(5);
-      setMsec(0);
-      set_turn_state_change("ready");
     } else if (cur_turn_states === "game") {
       time.current = 1000;
       setSec(10);
       setMsec(0);
-      set_turn_state_change("select_theme");
+      set_turn_state_change("ready");
       if (cur_round === 6) {
         return () => clearInterval(timer.current);
       } else if (currentIndex.current == player_count - 1) {
         currentIndex.current = 0;
-        set_who_turn("red");
+        if (currentIndex.current % 2 == 0) {
+          set_who_turn("blue");
+        } else {
+          set_who_turn("red");
+          set_cur_round(cur_round + 1);
+        }
       } else if (currentIndex.current % 2 == 0) {
         currentIndex.current += 1;
         set_who_turn("blue");
-        console.log("라운드" + cur_round);
       } else if (currentIndex.current % 2 == 1) {
         currentIndex.current += 1;
         set_who_turn("red");
-        console.log("라운드" + cur_round);
+        set_cur_round(cur_round + 1);
       }
+      set_CntAns(0);
     } else if (cur_turn_states === "first_ready") {
       time.current = 1000;
+      currentIndex.current = 0;
       set_who_turn("red");
       setSec(10);
       setMsec(0);
-      set_turn_state_change("select_theme");
+      set_turn_state_change("ready");
     }
   };
 

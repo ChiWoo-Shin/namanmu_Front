@@ -8,18 +8,16 @@ import good_sound from "../audio/good.mp3";
 import bad_sound from "../audio/bad.mp3";
 
 function S_words() {
-  let [show, setShow] = useState(null);
+  let [show, setShow] = useState([]);
 
-  const { cnt_answer, cnt_plus, cur_session } = useStore();
-  const { curRed_cnt, curBlue_cnt } = useStore(); //팀 라운드 별 점수
+  const { cnt_answer, set_CntAns, cur_session, cur_turn_states } = useStore();
   const {
-    curRed_total,
-    set_CurRed_total,
-    curBlue_total,
-    set_CurBlue_total,
     is_my_turn,
     cur_who_turn,
     my_index,
+    setPublishAudio,
+    myUserID,
+    gamers,
   } = useStore();
   const { gamerWords, fetchGamerWords } = useStore();
   //ZUSTAND
@@ -28,38 +26,41 @@ function S_words() {
   const [bad] = useSound(bad_sound);
   //USE Sound
 
-  let [show_name, setShow_name] = useState("게임을 시작하겠습니다.");
+  let [show_name, setShow_name] = useState("--------");
   const [answer, setAnswer] = useState("");
-  let [correct, setCorrect] = useState(["정답입니다.", "틀렸습니다."]);
+
   let [number, setNumber] = useState(cnt_answer);
 
   const [showIndex, setShowIndex] = useState(0);
   const [my_team_turn, set_my_team_turn] = useState(false);
 
   useEffect(async ()=>{
-    await fetchGamerWords();
-  },[]);
-
-  useEffect(()=>{
-    setShow(gamerWords)
-    console.log("show update")
-    console.log(show)
-  },[gamerWords])
+    if (cur_round !==0){
+      setShow([]);
+      await fetchGamerWords();
+    }
+    
+  },[cur_round]);
 
   useEffect(() => {
-    let timer;
-    timer = setTimeout(() => {
-      setShow_name(show[0]);
-    }, 2000);
-    return () => {
-      clearTimeout(timer);
-    };
-  }, []);
+    setShow(show.concat(gamerWords.map(a => a.name)));
+    console.log("show time")
+    console.log(show[showIndex])
+  }, [gamerWords])
+  
+  useEffect(()=>{
+    setShow_name(show[showIndex]);
+  },[show])
+
+  // useEffect(() => {
+  //   if (cur_turn_states === "game") {
+  //     setShow_name(show[0]);
+  //   }
+  // }, [cur_turn_states]);
 
   useEffect(() => {
     setNumber(cnt_answer);
   }, [cnt_answer]);
-
   useEffect(() => {
     if (number !== 0) {
       sendScore();
@@ -69,6 +70,7 @@ function S_words() {
       }
     }
   }, [number]);
+
   useEffect(() => {
     if (cur_who_turn === "red" && my_index % 2 === 0) {
       set_my_team_turn(true);
@@ -77,7 +79,6 @@ function S_words() {
     } else {
       set_my_team_turn(false);
     }
-    console.log("바꼈니? :" + my_team_turn);
   }, [cur_who_turn]);
   useEffect(() => {}, [is_my_turn]);
   const nextShow = () => {
@@ -97,11 +98,9 @@ function S_words() {
 
   const check_Score = (e) => {
     if (show_name === answer) {
-      cnt_plus(cnt_answer + 1);
-      setCorrect(0);
+      set_CntAns(cnt_answer + 1);
       setAnswer("");
     } else {
-      setCorrect(1);
       bad();
       setAnswer("");
     }
@@ -113,8 +112,11 @@ function S_words() {
   };
   return (
     <>
+      {cur_turn_states === "room" && <div> 대기방입니다 </div>}
       {(is_my_turn || !my_team_turn) && <div>{show_name}</div>}
-      {!is_my_turn && (
+      {/* 내 턴이거나 내 팀 턴이 아닐경우에만 문제를 띄움 */}
+      {!is_my_turn && my_team_turn && (
+        // 내 턴이 아니고 우리팀 턴일 경우(이야기꾼을 제외한 나머지)
         <>
           <input
             id="Answer_input"

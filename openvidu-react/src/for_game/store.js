@@ -1,11 +1,7 @@
 import create from "zustand";
-import axios from "axios";
 
-const APPLICATION_SERVER_URL = "http://localhost:5000/";
-// const APPLICATION_SERVER_URL = 'https://practiceggmm.shop/';
-
-
-const useStore = create(set => ({
+const useStore = create((set) => ({
+  //치우
   gamers: [],
   setGamers: (gamer) => {
     set((state) => ({
@@ -23,18 +19,25 @@ const useStore = create(set => ({
       gamers: [],
     }));
   },
-
+  setPublishAudio: (name, newValue) => {
+    set((state) => {
+      const gamer = state.gamers.find((x) => x.name === name);
+      gamer.streamManager.publishAudio = newValue;
+      return { gamers: state.gamers };
+    });
+  },
 
   myUserID: "none",
   set_myUserID: (input) => set({ myUserID: input }),
+  //경준
   cur_time: 1000000,
-  settime: (input) => set({ cur_time: input }),
+  set_Curtime: (input) => set({ cur_time: input }),
 
   time_state: "no_change",
   set_time_change: (input) => set({ time_state: input }),
 
   cnt_answer: 0,
-  cnt_plus: (input) => set(() => ({ cnt_answer: input })),
+  set_CntAns: (input) => set(() => ({ cnt_answer: input })),
 
   //Team 별  round 점수
   curRed_cnt: 0,
@@ -52,7 +55,7 @@ const useStore = create(set => ({
   cur_turn_states: "room",
   set_turn_state_change: (input) => set({ cur_turn_states: input }),
 
-  cur_who_turn: "none",
+  cur_who_turn: "none", //누구 턴인지
   set_who_turn: (input) => set({ cur_who_turn: input }),
 
   cur_round: 0,

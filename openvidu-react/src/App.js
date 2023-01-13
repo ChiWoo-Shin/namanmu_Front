@@ -281,7 +281,7 @@ class webCam extends Component {
             <div id="session">
               <div id="session-header">
                 <CreateInvitation mySessionId={mySessionId} />
-                {/* <h1 id="session-title">{mySessionId}</h1> */}
+                <h1 id="session-title">{mySessionId}</h1>
                 <input
                   className="btn btn-large btn-danger"
                   type="button"
