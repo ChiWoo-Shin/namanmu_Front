@@ -209,7 +209,7 @@ class webCam extends Component {
     this.setState({
       session: undefined,
       subscribers: [],
-      mySessionId: "SessionA",
+      mySessionId: "Session" + Math.floor(Math.random() * 100),
       myUserName: "Participant" + Math.floor(Math.random() * 100),
       publisher: undefined,
     });
