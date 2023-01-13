@@ -1,7 +1,11 @@
 import create from "zustand";
+import axios from "axios";
 
-const useStore = create((set) => ({
-  //치우
+const APPLICATION_SERVER_URL = "http://localhost:5000/";
+// const APPLICATION_SERVER_URL = 'https://practiceggmm.shop/';
+
+
+const useStore = create(set => ({
   gamers: [],
   setGamers: (gamer) => {
     set((state) => ({
@@ -20,9 +24,9 @@ const useStore = create((set) => ({
     }));
   },
 
+
   myUserID: "none",
   set_myUserID: (input) => set({ myUserID: input }),
-  //경준
   cur_time: 1000000,
   settime: (input) => set({ cur_time: input }),
 
@@ -48,7 +52,7 @@ const useStore = create((set) => ({
   cur_turn_states: "room",
   set_turn_state_change: (input) => set({ cur_turn_states: input }),
 
-  cur_who_turn: "none", //누구 턴인지
+  cur_who_turn: "none",
   set_who_turn: (input) => set({ cur_who_turn: input }),
 
   cur_round: 0,
@@ -65,6 +69,14 @@ const useStore = create((set) => ({
 
   player_count: 0,
   set_player_count: (input) => set({ player_count: input }),
+
+  gamerWords: [],
+  fetchGamerWords: async () => {
+      const response = await axios.get(APPLICATION_SERVER_URL + 'api/sessions/game', {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      response && set((state) => ({ gamerWords: (state.gamerWords = response.data) }));
+  }
 }));
 
 export default useStore;

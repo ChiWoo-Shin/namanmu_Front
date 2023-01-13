@@ -8,18 +8,7 @@ import good_sound from "../audio/good.mp3";
 import bad_sound from "../audio/bad.mp3";
 
 function S_words() {
-  let [show, setShow] = useState([
-    "제시어1",
-    "제시어2",
-    "제시어3",
-    "제시어4",
-    "제시어5",
-    "제시어6",
-    "제시어7",
-    "제시어8",
-    "제시어9",
-    "제시어10",
-  ]);
+  let [show, setShow] = useState(null);
 
   const { cnt_answer, cnt_plus, cur_session } = useStore();
   const { curRed_cnt, curBlue_cnt } = useStore(); //팀 라운드 별 점수
@@ -32,6 +21,7 @@ function S_words() {
     cur_who_turn,
     my_index,
   } = useStore();
+  const { gamerWords, fetchGamerWords } = useStore();
   //ZUSTAND
 
   const [good] = useSound(good_sound);
@@ -45,6 +35,17 @@ function S_words() {
 
   const [showIndex, setShowIndex] = useState(0);
   const [my_team_turn, set_my_team_turn] = useState(false);
+
+  useEffect(async ()=>{
+    await fetchGamerWords();
+  },[]);
+
+  useEffect(()=>{
+    setShow(gamerWords)
+    console.log("show update")
+    console.log(show)
+  },[gamerWords])
+
   useEffect(() => {
     let timer;
     timer = setTimeout(() => {

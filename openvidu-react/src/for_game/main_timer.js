@@ -126,6 +126,7 @@ function Main_timer() {
       }
     }
   }, [player_count]);
+  
   useEffect(() => {
     console.log("인덱스 변경" + my_index);
   }, [my_index]);
