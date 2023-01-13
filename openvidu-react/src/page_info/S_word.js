@@ -29,6 +29,8 @@ function S_words() {
     curBlue_total,
     set_CurBlue_total,
     is_my_turn,
+    cur_who_turn,
+    my_index,
   } = useStore();
   //ZUSTAND
 
@@ -41,9 +43,8 @@ function S_words() {
   let [correct, setCorrect] = useState(["정답입니다.", "틀렸습니다."]);
   let [number, setNumber] = useState(cnt_answer);
 
-  const [inputVisible, setInputVisible] = useState(false);
   const [showIndex, setShowIndex] = useState(0);
-
+  const [my_team_turn, set_my_team_turn] = useState(false);
   useEffect(() => {
     let timer;
     timer = setTimeout(() => {
@@ -53,15 +54,11 @@ function S_words() {
       clearTimeout(timer);
     };
   }, []);
-  useEffect(() => {
-    setTimeout(() => {
-      setInputVisible(true);
-    }, 2000);
-  }, []);
 
   useEffect(() => {
     setNumber(cnt_answer);
   }, [cnt_answer]);
+
   useEffect(() => {
     if (number !== 0) {
       sendScore();
@@ -72,8 +69,16 @@ function S_words() {
     }
   }, [number]);
   useEffect(() => {
-    console.log("마이턴 변경" + is_my_turn);
-  }, [is_my_turn]);
+    if (cur_who_turn === "red" && my_index % 2 === 0) {
+      set_my_team_turn(true);
+    } else if (cur_who_turn === "blue" && my_index % 2 === 1) {
+      set_my_team_turn(true);
+    } else {
+      set_my_team_turn(false);
+    }
+    console.log("바꼈니? :" + my_team_turn);
+  }, [cur_who_turn]);
+  useEffect(() => {}, [is_my_turn]);
   const nextShow = () => {
     setShowIndex(showIndex + 1);
     setShow_name(show[showIndex + 1]);
@@ -107,7 +112,7 @@ function S_words() {
   };
   return (
     <>
-      {is_my_turn && <div>{show_name}</div>}
+      {(is_my_turn || !my_team_turn) && <div>{show_name}</div>}
       {!is_my_turn && (
         <>
           <input

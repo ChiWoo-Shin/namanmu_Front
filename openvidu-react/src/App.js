@@ -305,7 +305,6 @@ class webCam extends Component {
                   </div>
                   <div className="video_box">
                     <div id={0} className="video_frame">
-                      {/* {this.state.gamers[0] && <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[0].streamManager} /></div>} */}
                       {useStore.getState().gamers[0] && (
                         <div className="video_frame">
                           {" "}
@@ -320,13 +319,12 @@ class webCam extends Component {
                   </div>
                   <div className="video_box">
                     <div id={1} className="video_frame">
-                      {/* {this.state.gamers[1] && <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[1].streamManager} /></div>} */}
-                      {useStore.getState().gamers[1] && (
+                      {useStore.getState().gamers[2] && (
                         <div className="video_frame">
                           {" "}
                           <UserVideoComponent
                             streamManager={
-                              useStore.getState().gamers[1].streamManager
+                              useStore.getState().gamers[2].streamManager
                             }
                           />
                         </div>
@@ -335,13 +333,12 @@ class webCam extends Component {
                   </div>
                   <div className="video_box">
                     <div id={2} className="video_frame">
-                      {/* {this.state.gamers[2] && <div className="video_frame"> <UserVideoComponent streamManager={this.state.gamers[2].streamManager} /></div>} */}
-                      {useStore.getState().gamers[2] && (
+                      {useStore.getState().gamers[4] && (
                         <div className="video_frame">
                           {" "}
                           <UserVideoComponent
                             streamManager={
-                              useStore.getState().gamers[2].streamManager
+                              useStore.getState().gamers[4].streamManager
                             }
                           />
                         </div>
@@ -361,18 +358,13 @@ class webCam extends Component {
 
                   <div>
                     <div className="team_box">
-                      <div className="team_turn">
-                        {/* <Button onClick={renderCam4}>원본</Button>
-												<Button onClick={renderCam}>blur</Button>
-												<Button onClick={renderCam2}>좌좌우우</Button>
-												<Button onClick={renderCam3}>퍼즐(4)</Button> */}
-                      </div>
+                      <div className="team_turn"></div>
                     </div>
 
                     <div>
                       <S_words />
                     </div>
-                    <Button onClick={() => this.sendTimer()}>Send Timer</Button>
+                    <Button onClick={() => this.sendTimer()}>게임시작</Button>
                   </div>
                 </div>
                 {/* B팀 프레임 */}
@@ -391,12 +383,12 @@ class webCam extends Component {
                   </div>
                   <div className="video_box">
                     <div id={3} className="video_frame">
-                      {useStore.getState().gamers[3] && (
+                      {useStore.getState().gamers[1] && (
                         <div className="video_frame">
                           {" "}
                           <UserVideoComponent
                             streamManager={
-                              useStore.getState().gamers[3].streamManager
+                              useStore.getState().gamers[1].streamManager
                             }
                           />
                         </div>
@@ -405,17 +397,12 @@ class webCam extends Component {
                   </div>
                   <div className="video_box">
                     <div id={4} className="video_frame">
-                      {/* {this.state.gamers[4] && (
-                      <div className="video_frame">
-                        <UserVideoComponent streamManager={this.state.gamers[4].streamManager} />
-                      </div>
-                    )} */}
-                      {useStore.getState().gamers[4] && (
+                      {useStore.getState().gamers[3] && (
                         <div className="video_frame">
                           {" "}
                           <UserVideoComponent
                             streamManager={
-                              useStore.getState().gamers[4].streamManager
+                              useStore.getState().gamers[3].streamManager
                             }
                           />
                         </div>
