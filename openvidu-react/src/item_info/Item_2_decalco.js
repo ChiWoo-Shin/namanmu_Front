@@ -47,7 +47,7 @@ const ItemTwoDecal = ({ videoRef }) => {
           );
           ctx.setTransform(1, 0, 0, 1, 0, 0);
           console.log("두번째 아이템 작동합니다.");
-          setTimeout(drawFrame, 50);
+          set_Curtimeout(drawFrame, 50);
         }
         if (!videoRef.current.paused && !videoRef.current.ended) {
           const ctx = canvasRef.current.getContext("2d");
@@ -66,7 +66,7 @@ const ItemTwoDecal = ({ videoRef }) => {
           );
           ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-          setTimeout(drawFrame, 50);
+          set_Curtimeout(drawFrame, 50);
         }
       }
       drawFrame();

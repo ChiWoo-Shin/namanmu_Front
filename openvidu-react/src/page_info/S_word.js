@@ -8,7 +8,9 @@ import good_sound from "../audio/good.mp3";
 import bad_sound from "../audio/bad.mp3";
 
 function S_words() {
+
   let [show, setShow] = useState([]);
+
 
   const { cnt_answer, set_CntAns, cur_session, cur_turn_states } = useStore();
   const {
@@ -43,6 +45,7 @@ function S_words() {
   },[cur_round]);
 
   useEffect(() => {
+
     setShow(show.concat(gamerWords.map(a => a.name)));
     console.log("show time")
     console.log(show[showIndex])
@@ -57,6 +60,7 @@ function S_words() {
   //     setShow_name(show[0]);
   //   }
   // }, [cur_turn_states]);
+
 
   useEffect(() => {
     setNumber(cnt_answer);
