@@ -78,7 +78,9 @@ function S_words() {
     }
     console.log("바꼈니? :" + my_team_turn);
   }, [cur_who_turn]);
-  useEffect(() => {}, [is_my_turn]);
+  useEffect(() => {
+    console.log("내 턴이냐? " + is_my_turn);
+  }, [is_my_turn]);
   const nextShow = () => {
     setShowIndex(showIndex + 1);
     setShow_name(show[showIndex + 1]);
@@ -113,7 +115,9 @@ function S_words() {
   return (
     <>
       {(is_my_turn || !my_team_turn) && <div>{show_name}</div>}
-      {!is_my_turn && (
+      {/* 내 턴이거나 내 팀 턴이 아닐경우에만 문제를 띄움 */}
+      {!is_my_turn && my_team_turn && (
+        // 내 턴이 아니고 우리팀 턴일 경우(이야기꾼을 제외한 나머지)
         <>
           <input
             id="Answer_input"
